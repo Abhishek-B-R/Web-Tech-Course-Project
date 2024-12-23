@@ -1,21 +1,20 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
-import SendBackendReq from "./SendBackendReq"
+import SendBackendReq from "./SendBackendReq";
+import ShowAllEntries from "./ShowAllEntries";
 
-function AbsenteeEntries({ noOfStud, startNo }) {
+function AbsenteeEntries({ noOfStud, startNo, selectedSubject, setSelectedSubject, setViewEntries, viewEntries }) {
     noOfStud = parseInt(noOfStud);
     startNo = parseInt(startNo);
 
-    if (!noOfStud) noOfStud = 10;
-    if (!startNo) startNo = 100;
+    if (Number.isNaN(noOfStud)) noOfStud = 10;
+    if (Number.isNaN(startNo)) startNo = 100;
 
-    const [selectedSubject, setSelectedSubject] = useState("Web Tech"); // State for the chosen subject
     const [doneSending, setDoneSending] = useState(false);
 
-    // Generate roll numbers starting from startNo
-    const rollNumbers = Array.from({ length: noOfStud }, (_, index) => startNo + index);
+    // Start generating rollNumbers from startNo + 1
+    const rollNumbers = Array.from({ length: noOfStud }, (_, index) => startNo + 1 + index);
 
-    // Initialize attendance to true (Present) for all roll numbers
     const [attendanceData, setAttendanceData] = useState(() =>
         rollNumbers.reduce((acc, rollNo) => {
             acc[rollNo] = true; // Default to true (Present)
@@ -23,16 +22,12 @@ function AbsenteeEntries({ noOfStud, startNo }) {
         }, {})
     );
 
-    // Handle Submit
     const handleSubmit = () => {
-        console.log("Attendance Data:", attendanceData);
         const attendanceArray = rollNumbers.map((rollNo) => attendanceData[rollNo]);
-        console.log("Final Attendance Array:", attendanceArray);
-        SendBackendReq(attendanceArray,startNo,selectedSubject)
+        SendBackendReq(attendanceArray, startNo + 1, selectedSubject); // Adjust startNo for the backend
         setDoneSending(true);
     };
 
-    // Update attendance for a specific roll number
     const updateAttendance = (rollNo, value) => {
         setAttendanceData((prev) => ({
             ...prev,
@@ -43,19 +38,41 @@ function AbsenteeEntries({ noOfStud, startNo }) {
     if (doneSending) {
         return (
             <div className="flex mt-52 justify-center">
-                <h1 className="text-3xl font-bold">Your results have been updated in the database</h1>
+                <h1 className="text-3xl font-bold text-white">Your results have been updated in the database</h1>
+                <input
+                    type="button"
+                    value="Show all entries till now"
+                    onClick={() => setViewEntries(true)}
+                    className="bg-green-500 text-white p-3 rounded ml-4"
+                />
             </div>
+        );
+    }
+
+    if (viewEntries) {
+        return (
+            <>
+                <ShowAllEntries
+                    selectedSubject={selectedSubject}
+                    setSelectedSubject={setSelectedSubject}
+                />
+                <button
+                    onClick={() => setViewEntries(false)}
+                    className="bg-red-500 text-white p-3 rounded mt-4"
+                >
+                    Back
+                </button>
+            </>
         );
     }
 
     return (
         <>
-            {/* Top-right subject dropdown */}
-            <div className="fixed top-4 right-4 text-black">
+            <div className="fixed top-10r right-10">
                 <select
                     value={selectedSubject}
                     onChange={(e) => setSelectedSubject(e.target.value)}
-                    className="border border-gray-300 p-2 rounded"
+                    className="border border-gray-600 bg-black p-2 rounded text-white"
                 >
                     <option value="Web Tech">Web Tech</option>
                     <option value="Software Engineering">Software Engineering</option>
@@ -65,8 +82,8 @@ function AbsenteeEntries({ noOfStud, startNo }) {
                 </select>
             </div>
 
-            <div className="p-4 text-black ml-10 mb-10">
-                <h3 className="font-bold mb-4 text-white text-2xl">
+            <div className="p-4 text-white ml-20 mt-10">
+                <h3 className="font-bold mb-4 text-2xl">
                     Subject: {selectedSubject}
                 </h3>
                 {rollNumbers.map((rollNo) => (
@@ -74,31 +91,38 @@ function AbsenteeEntries({ noOfStud, startNo }) {
                 ))}
             </div>
 
-            <div>
+            <div className="ml-10">
                 <input
                     type="button"
                     value="Submit"
                     onClick={handleSubmit}
-                    className="bg-yellow-500 text-black border border-gray-300 p-3 rounded ml-14"
+                    className="bg-yellow-500 text-black border border-gray-600 p-3 rounded ml-14"
+                />
+                <input
+                    type="button"
+                    value="Show all entries till now"
+                    onClick={() => setViewEntries(true)}
+                    className="bg-green-500 text-white p-3 rounded ml-4"
                 />
             </div>
         </>
     );
 }
 
+
 function InputBox({ rollNo, updateAttendance }) {
     return (
         <div className="flex items-center gap-4 mb-4">
             <input
                 type="number"
-                value={rollNo} // Display actual roll number
+                value={rollNo}
                 readOnly
-                className="border border-gray-300 p-2 rounded bg-gray-100"
+                className="border border-gray-600 p-2 rounded bg-gray-800 text-white"
             />
             <select
-                defaultValue="Present" // Default to Present
+                defaultValue="Present"
                 onChange={(e) => updateAttendance(rollNo, e.target.value)}
-                className="border border-gray-300 p-2 rounded"
+                className="border border-gray-600 bg-black p-2 rounded text-white"
             >
                 <option value="Present">Present</option>
                 <option value="Absent">Absent</option>
@@ -107,4 +131,4 @@ function InputBox({ rollNo, updateAttendance }) {
     );
 }
 
-export default AbsenteeEntries;
+export default AbsenteeEntries

@@ -7,8 +7,5 @@ const studentSchema = new Schema({
   attendence: { type: Boolean, required: true } // Attendance
 });
 
-// Create a unique index on the combination of rollno and subject
-studentSchema.index({ rollno: 1, subject: 1 }, { unique: true });
-
 const StudentModel = mongoose.model("Student", studentSchema);
 module.exports = StudentModel;

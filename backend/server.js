@@ -31,41 +31,27 @@ app.get('/Students', async (req, res) => {
 });
 
 app.post('/Students', async (req, res) => {
-  const { attendanceArray, startNo, selectedSubject } = req.body;
+  const studentData = req.body; // Expecting an array of student objects
 
-  if (!attendanceArray || !startNo || !selectedSubject) {
-    return res.status(400).json({ error: "Missing required fields" });
+  if (!Array.isArray(studentData) || studentData.length === 0) {
+    return res.status(400).json({ error: "Invalid or missing data" });
   }
 
-  const studentData = attendanceArray.map((attendance, index) => ({
-    rollno: startNo + index + 1,
-    subject: selectedSubject,
-    attendence: attendance,
-  }));
-
   try {
-    // Check for duplicates and only insert new records
-    const bulkOps = studentData.map((student) => ({
-      updateOne: {
-        filter: { rollno: student.rollno, subject: student.subject },
-        update: { $setOnInsert: student },
-        upsert: true,
-      },
-    }));
-
-    const result = await Student.bulkWrite(bulkOps);
+    // Insert all entries directly into the database
+    const result = await Student.insertMany(studentData, { ordered: false });
     res.status(201).json({ message: "Students added successfully", data: result });
   } catch (err) {
     console.error("Error while inserting students:", err);
-    res.status(500).json({ error: "Failed to save students", details: err.message });
+    res.status(500).json({
+      error: "Failed to save some or all students",
+      details: err.message,
+    });
   }
 });
 
-
-
-
 app.post('/',async (req,res)=>{
-    const { name , status } = req.body;
+  const { name , status } = req.body;
 })
 
 app.listen(5000, () => console.log('Server running on http://localhost:5000'));
