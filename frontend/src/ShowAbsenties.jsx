@@ -15,7 +15,7 @@ function ShowAllEntries({ selectedSubject, setSelectedSubject }) {
 
             // Filter by subject and sort by roll number
             const filteredData = data
-                .filter((entry) => entry.subject === subject ) // Ensure subject filtering
+                .filter((entry) => entry.subject === subject && !entry.attendence) // Ensure subject filtering
                 .sort((a, b) => a.rollno - b.rollno); // Sort by rollno
 
             setFetchedData(filteredData);

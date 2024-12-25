@@ -4,12 +4,12 @@ import { useState } from 'react';
 // import AbsenteeEntries from './AbsenteeEntries'
 
 function App() {
-  const [selectedSubject, setSelectedSubject] = useState("Web Tech");
   const [viewEntries, setViewEntries] = useState(false);
+  const [selectedSubject, setSelectedSubject] = useState("Web Tech");
   return (
     <>
-      <EntryPage selectedSubject={selectedSubject} setSelectedSubject={setSelectedSubject}
-      viewEntries={viewEntries} setViewEntries={setViewEntries}/>
+      <EntryPage viewEntries={viewEntries} setViewEntries={setViewEntries}
+      selectedSubject={selectedSubject} setSelectedSubject={setSelectedSubject}/>
     </>
   )
 }

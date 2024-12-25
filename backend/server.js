@@ -33,13 +33,38 @@ app.get('/Students', async (req, res) => {
 app.post('/Students', async (req, res) => {
   const studentData = req.body; // Expecting an array of student objects
 
+  // Validate input
   if (!Array.isArray(studentData) || studentData.length === 0) {
     return res.status(400).json({ error: "Invalid or missing data" });
   }
 
+  // Transform data to ensure proper structure
+  const transformedData = studentData.map((student) => ({
+    rollno: student.rollNo || 0,
+    bookletNo: student.bookletNumber || 0,
+    subject: student.subject || "Unknown",
+    attendence: typeof student.attendence === "boolean" ? student.attendence : false,
+  }));
+
+  // Validate entries for any missing or incorrect data
+  const invalidEntries = transformedData.filter(
+    (student) =>
+      typeof student.rollno !== "number" ||
+      typeof student.bookletNo !== "number" ||
+      typeof student.subject !== "string" ||
+      typeof student.attendence !== "boolean"
+  );
+
+  if (invalidEntries.length > 0) {
+    return res.status(400).json({
+      error: "Some entries have missing or invalid fields",
+      invalidEntries,
+    });
+  }
+
   try {
-    // Insert all entries directly into the database
-    const result = await Student.insertMany(studentData, { ordered: false });
+    // Insert validated data into MongoDB
+    const result = await Student.insertMany(transformedData, { ordered: false });
     res.status(201).json({ message: "Students added successfully", data: result });
   } catch (err) {
     console.error("Error while inserting students:", err);
@@ -49,6 +74,8 @@ app.post('/Students', async (req, res) => {
     });
   }
 });
+
+
 
 app.post('/',async (req,res)=>{
   const { name , status } = req.body;
