@@ -41,15 +41,25 @@ function EntryPage({selectedSubject,setSelectedSubject,setViewEntries,viewEntrie
     }
 
     if (showAttendenceEntries) {
-        return <AttendenceEntries 
-            noOfStud={noOfStud} 
-            startNo={startNo} 
-            startBookletNo={startBookletNo}
-            selectedSubject={selectedSubject} 
-            setSelectedSubject={setSelectedSubject}
-            viewEntries={viewEntries} 
-            setViewEntries={setViewEntries}
-        />; 
+        return (
+            <div>
+                <AttendenceEntries 
+                    noOfStud={noOfStud} 
+                    startNo={startNo} 
+                    startBookletNo={startBookletNo}
+                    selectedSubject={selectedSubject} 
+                    setSelectedSubject={setSelectedSubject}
+                    viewEntries={viewEntries} 
+                    setViewEntries={setViewEntries}
+                />
+                <button
+                    onClick={() => setShowAttendenceEntries(false)}
+                    className="ml-30 bg-red-500 text-white p-3 rounded mt-4"
+                >
+                    Back
+                </button>
+            </div>
+        )
     }
 
     return <>
